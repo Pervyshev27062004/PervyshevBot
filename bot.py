@@ -1,35 +1,36 @@
-# bot.py
+import aioredis
 import os
 import logging
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
-from telegram.ext.filters import BaseFilter
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+redis = aioredis.from_url("redis://localhost")
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info(
-        f"Message from chat #{update.effective_chat.id}"
-        f"Message {update.effective_user.first_name}"
+        f"Start chat #{update.effective_chat.id} - username {update.effective_user.first_name}"
     )
+    await redis.lpush("chats", update.effective_chat.id)
     await update.message.reply_text(
-        f"Hello {update.effective_user.first_name} ({update.effective_chat.id})"
+        f"Hello {update.effective_user.first_name}"
     )
 
 
 async def message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info(
-        f"Message from chat #{update.effective_chat.id}"
-        f"Message {update.effective_user.first_name}"
+        f"Message {update.message.text} from chat #{update.effective_chat.id}"
     )
     await update.message.reply_text(
-        f"Hello {update.effective_user.first_name} ({update.effective_chat.id})"
+        f"Hello {update.effective_user.first_name}"
     )
+
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()

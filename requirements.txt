@@ -1,1 +1,4 @@
 python-telegram-bot==20.2
+marshmallow==3.18.0
+aiohttp==3.8.3
+aiohttp-apispec==2.2.3
